@@ -83,3 +83,18 @@ pyglet.app.run()
 		
 import serial
 ser = serial.Serial('/dev/tty.ACM0', 9600) # args: path/to/ard, sampling rate  tty.ACM0
+# def circle(x, y, radius):
+#     """
+#     We want a pixel perfect circle.
+#     """
+#     iterations = int(2 * radius * pi)
+#     s = sin(2 * pi / iterations)
+#     c = cos(2 * pi / iterations)
+#     dx, dy = radius, 0
+#     glBegin(GL_TRIANGLE_FAN)
+#     glVertex2f(x, y)
+#     for i in range(iterations + 1 - 10):
+#         glVertex2f(x + dx, y + dy)
+#         dx, dy = (dx * c - dy * s), (dy * c + dx * s)
+#     glEnd()
+
