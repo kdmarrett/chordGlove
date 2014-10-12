@@ -9,10 +9,11 @@ import resources
 import serial
 from FileOutput import FileOutput
 from HardwareInterface import HardwareInterface
+# from ValidInput import *
+import ValidInput
+import Section, testSection, trainSection, learnSection
 
-
-# make method for checking stable input
-
+# CLASS CONSTANTS
 # SAMPLE_RATE = 9600
 TIME_SAMPLE = .01
 GLOBAL_TIME = 0
@@ -28,201 +29,31 @@ defaultLetterDict = {'A': 8, 'B':16, 'C':24, 'D':12, 'E':14, 'F':5, 'G':1, 'H':2
     'I':4, 'J':20, 'K':28, 'L':29, 'M':10, 'N':11, 'O':2, 'P':13, 'Q':23, 'R':18, 
     'S':30, 'T':6, 'U':9, 'V':3, 'W':15, 'X':26, 'Y':7, 'Z':21, 
     '.':17, ',':22, '?':19, ' ':31, "Delete":25}
-
 letters = defaultLetterDict.keys()
 
-class ValidInput():
+subject = 'Karl'
+DictFilesPath = '/home/kdmarrett/git/chordGlove/DictFiles'
+skipTraining = 1
+# PathToSubject ?
 
-    def __init__(self):
-        self.stableInput = False
-        self.totalStabilityTime = 0
-        self.currentChord = 0
-        self.currentList = []
-        self.timeNoChange = 0
-        self.baselineInput = 0  # sets to null
-
-    def tic(self):
-        Section.currentHardware()
-        if currentChord == baselineinput:
-            if timeNoChange > LOCK_TIME:
-                stableInput = True
-            else:
-                timeNoChange += TIME_SAMPLE
-        else:
-            timeNoChange = 0
-        return self.stableInput
-
-    def setBaseline(self, chord):
-        self.baselineInput = chord
-
-
-class Section:
-    global sectionBackground
-    global letters
-
-    def __init__(self):
-        self.pastChord = 0
-        self.ValidInput = ValidInput()
-        self.letterComplete = False
-        self.sectionComplete = False
-        self.letterIndex = 0
-        self.currentLetter = letters[letterIndex]  # always space
-        self.currentChord = 0
-        self.currentList = []
-
-    def currentHardware(self):
-        self.currentChord = HardwareInterface.getChord()
-        sel.currentList = HardwareInterface.chordToList(currentChord)
-        # global currentChord
-        # global currentList
-        # self.ValidInput.currentChord = HardwareInterface.getChord()
-        # sel.ValidInput.currentList = HardwareInterface.chordToList(currentChord)
-
-    def drawText(self, text):
-        global sectionBackground
-        label = pyglet.text.Label(text, font_name='Times New Roman', font_size=36,
-                                  x=window.width / 2, y=window.height / 2, anchor_x='center', anchor_y='center', batch=sectionBackground)
-
-    def drawFingerCircles(self, currentList):
-        global FINGERS
-        global sectionBackground
-        global circleList
-        circularSteps = pi / (FINGERS - 1)
-        arcRadiusX = int(round(min(window.width, window.height) / 2))
-        arcRadiusY = int(round(window.height / 4))
-        # print "new circle"
-        # circle = pyglet.sprite.Sprite(img = resources.whiteCircle, x = 50, y = 50, batch = sectionBackground)
-        for i in range(FINGERS):
-            phi = pi - circularSteps * i
-            x = x_center + arcRadiusX * cos(phi)
-            y = y_center + arcRadiusY * sin(phi)
-            if currentList[i] == 0:  # if off color is white
-                color = (255, 255, 255)
-            else:  # else turn red
-                color = (255, 0, 0)
-            # circleList[i] = pyglet.sprite.Sprite(resources.whiteCircle, x, y, batch = sectionBackground)
-            circleList[i].scale = .17
-            circleList[i].color = color
-            circleList[i].position = (x, y)
-            # print "x=" + str(x)+ "y=" + str(y)
-            # print "x_center" + str(x_center)
-            # print "y_center"+ str(y_center)
-            # circle = pyglet.sprite.Sprite(resources.whiteCircle, x, y, color)
-        # add to batch
-        # circle.draw()
-
-
-class learnSection(Section):
-    def __init__(self):
-        Section.__init__(self)  # extend Section init
-        self.finalLetterDict = {}
-        # change baselineInput to pastChord
-
-    def tic(self):
-        currentHardware()
-        if letterIndex > len(letters):
-            sectionComplete = True
-        if not sectionComplete:
-            if not letterComplete:
-                self.letterComplete = onlineFeedback()
-            else:
-                if isUniqueChord(self.currentChord):
-                    self.finalLetterDict[currentLetter] = currentChord
-                    self.letterComplete = False
-                    letterIndex += 1
-                    ValidInput = ValidInput()  # recreate instance
-                else:
-                    self.letterComplete = False
-                    drawText("Please choose a unique finger combination")
-        else: 
-            letters = self.finalLetterDict.keys()
-        self.pastChord = self.currentChord
-
-    def onlineFeedback(self):
-        drawText(self.currentLetter)  # writes letter text to background buffer
-        drawFingerCircles(self.currentList)
-        ValidInput.setBaseline(self.pastChord)  # update baseline in ValidInput
-        return ValidInput.tic()
-
-    def isUniqueChord(self, chord):
-        return chord in self.finalLetterDict.values()
-
-
-class trainSection(Section):
-    def __init__(self):
-        Section.__init__(self)
-        # print "chi" + str(letterIndex)
-        # print "chi" + str(letters)
-        # print "next" + str(letters[0]) + "chchc"
-        # currentKey =  str(letters[letterIndex]) + "chchc"
-        print learnSection.finalLetterDict.keys()
-        # currentKey =  str(letters[letterIndex])
-        # currentKey = ' ' 
-        # currentKey = 'R' 
-        # print finalLetterDict[currentKey]  #check this for bugs
-        print learnSection.finalLetterDict[letters[letterIndex]]  #check this for bugs
-        self.correctChord = learnSection.finalLetterDict[letters[letterIndex]]  #check this for bugs
-        self.correctList = HardwareInterface.chordToList(self.correctChord)
-
-    def tic(self):
-        currentHardware()
-        self.correctChord = learnSection.finalLetterDict[letters[letterIndex]]  #check this for bugs
-        if letterIndex > len(letters):
-            sectionComplete = True
-        if not sectionComplete:
-            if not letterComplete:
-                self.letterComplete = onlineFeedback()
-            else:
-                learnSection.finalLetterDict[currentLetter] = currentChord
-                self.letterComplete = False
-                letterIndex += 1
-                ValidInput = ValidInput()  # recreate instance
-        self.pastChord = self.currentChord
-
-    def onlineFeedback(self):
-        drawText(self.currentLetter)  # writes letter text to background buffer
-        drawFingerCircles(self.currentList)
-        # update baseline in ValidInput
-        ValidInput.setBaseline(self.correctChord)
-        return ValidInput.tic()
-
-
-class testSection(Section):
-
-    def __init__(self):
-        Section.__init__(self)
-        correctChord = learnSection.finalLetterDict[letters[letterIndex]]
-
-    def tic(self):
-        currentHardware()
-        self.correctChord = learnSection.finalLetterDict[letters[letterIndex]]
-        self.correctList = HardwareInterface.chordToList(self.correctChord)
-        if letterIndex > len(letters):
-            sectionComplete = True
-        if not sectionComplete:
-            if not letterComplete:
-                self.letterComplete = onlineFeedback()
-            else:
-                learnSection.finalLetterDict[currentLetter] = currentChord
-                self.letterComplete = False
-                letterIndex += 1
-                ValidInput = ValidInput()  # recreate instance
-        self.pastChord = self.currentChord
-
-    def onlineFeedback(self):
-        drawText(self.currentLetter)  # writes letter text to background buffer
-        drawFingerCircles(self.currentList)
-        # update baseline in ValidInput
-        ValidInput.setBaseline(self.correctChord)
-        return ValidInput.tic()
-
+# MAIN
+learnSection = learnSection()
+if skipTraining:
+    learnSection.finalLetterDict = defaultLetterDict
+trainSection = trainSection()
+testSection = testSection()
+HardwareInterface = HardwareInterface()
+# initiate batch needs to be global
+sectionBackground = pyglet.graphics.Batch()
+# args of dt must be defined here
+pyglet.clock.schedule_interval(update, TIME_SAMPLE)
 
 def update(dt):
-    testSection.tic()
+    if not skipTraining:
+        testSection.tic()
     trainSection.tic()
     testSection.tic()
     GLOBAL_TIME = GLOBAL_TIME + dt
-
 
 @window.event
 def on_draw():
@@ -233,18 +64,4 @@ def on_draw():
     for i in range(FINGERS):
         circleList[i].draw()
 
-# main
-learnSection = learnSection()
-trainSection = trainSection()
-testSection = testSection()
-HardwareInterface = HardwareInterface()
-# initiate batch needs to be global
-sectionBackground = pyglet.graphics.Batch()
-stableInput = False
-# args of dt must be defined here
-pyglet.clock.schedule_interval(update, TIME_SAMPLE)
-# circle = pyglet.sprite.Sprite(img = resources.whiteCircle, x = 50, y = 50, batch = sectionBackground)
-# circle.visible = False
-circleList = [pyglet.sprite.Sprite(
-    resources.whiteCircle, batch=sectionBackground) for i in range(FINGERS)]
 pyglet.app.run()
