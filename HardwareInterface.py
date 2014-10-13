@@ -22,40 +22,28 @@ import time
 
 
 class HardwareInterface():
-
+	
 	def __init__(self):
-		try:
-			self.ser = serial.Serial('/dev/ttyACM0')
-			self.ser.flushInput()
-			time.sleep(2)
-		except:
-			pass
+		self.ser = serial.Serial('/dev/ttyACM0')
+		self.ser.flushInput()
+		time.sleep(2)
 		self.chord = 0
 		self.tau = 23
 		#We must wait a few seconds for the arduino to reboot after its serial connection is reset
 
 	def getChord(self):
-		try:
-			if self.ser.inWaiting() > 0:
-				self.chord = ord(self.ser.read(1)) & 0b00011111
-		except:
-			pass
+		if self.ser.inWaiting() > 0:
+			self.chord = ord(self.ser.read(1)) & 0b00011111
 		return self.chord
 
 	def setChord(self, chord):
-		try:
-			self.ser.write(str(chr(int(chord) | 0b00100000)))
-		except:
-			pass
+		self.ser.write(str(chr(int(chord) | 0b00100000)))
 
 	def getTau(self):
 		return self.tau
 
 	def setTau(self, localtau):
-		try:
-			self.ser.write(str(chr(int(localtau) | 0b01000000)))
-		except:
-			pass
+		self.ser.write(str(chr(int(localtau) | 0b01000000)))
 		self.tau = localtau
 
 	def chordToList(self, localChord):
@@ -65,4 +53,3 @@ class HardwareInterface():
 		if len(chordList) != 5:
 			return -1
 		return 16*chordList[0]+8*chordList[1]+4*chordList[2]+2*chordList[3]+1*chordList[4]
-
