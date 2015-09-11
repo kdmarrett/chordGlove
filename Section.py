@@ -12,7 +12,7 @@ class Section:
 
     def __init__(self):
         self.pastChord = 0
-        self.ValidInput = ValidInput()
+        self.ValidInput = ValidInput.ValidInput()
         self.letterComplete = False
         self.sectionComplete = False
         self.letterIndex = 0

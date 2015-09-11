@@ -13,7 +13,7 @@ class ValidInput():
         self.baselineInput = 0  # sets to null
 
     def tic(self):
-        Section.currentHardware()
+        Section.Section.currentHardware()
         if currentChord == baselineinput:
             if timeNoChange > LOCK_TIME:
                 stableInput = True
@@ -26,4 +26,3 @@ class ValidInput():
     def setBaseline(self, chord):
         self.baselineInput = chord
 
-learnSection = learnSection()
